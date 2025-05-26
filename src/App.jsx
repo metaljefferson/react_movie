@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback} from 'react'
 import Search from './components/Search.jsx'
 import Spinner from './components/Spinner.jsx'
 import MovieCard from './components/MovieCard.jsx'
@@ -26,11 +26,10 @@ const App = () => {
 
   const [trendingMovies, setTrendingMovies] = useState([]);
 
-  // Debounce the search term to prevent making too many API requests
-  // by waiting for the user to stop typing for 500ms
+
   useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm])
 
-  const fetchMovies = async (query = '') => {
+  const fetchMovies = useCallback(async (query = '') => {
     setIsLoading(true);
     setErrorMessage('');
 
@@ -56,7 +55,8 @@ const App = () => {
       setMovieList(data.results || []);
 
       if(query && data.results.length > 0) {
-        await updateSearchCount(query, data.results[0]);
+        await updateSearchCount(query.toLowerCase(), data.results[0]);
+        await loadTrendingMovies(); 
       }
     } catch (error) {
       console.error(`Error fetching movies: ${error}`);
@@ -64,23 +64,21 @@ const App = () => {
     } finally {
       setIsLoading(false);
     }
-  }
+  },[])
 
   const loadTrendingMovies = async () => {
     try {
       const movies = await getTrendingMovies();
-
-      // Garante que trendingMovies sempre será array para evitar erros
       setTrendingMovies(movies && Array.isArray(movies) ? movies : []);
     } catch (error) {
       console.error(`Error fetching trending movies: ${error}`);
-      setTrendingMovies([]); // fallback para array vazio
+      setTrendingMovies([]);
     }
   }
 
-  useEffect(() => {
-    fetchMovies(debouncedSearchTerm);
-  }, [debouncedSearchTerm]);
+ useEffect(() => {
+  fetchMovies(debouncedSearchTerm)
+}, [debouncedSearchTerm, fetchMovies])
 
   useEffect(() => {
     loadTrendingMovies();
@@ -92,7 +90,7 @@ const App = () => {
 
       <div className="wrapper">
         <header>
-          <img src="./hero.png" alt="Hero Banner" />
+          <img src="./logo.png" alt="Hero Banner" />
           <h1>Find <span className="text-gradient">Movies</span> You'll Enjoy Without the Hassle</h1>
 
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
