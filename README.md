@@ -4,7 +4,7 @@ Aplicação desenvolvida com React.js para a interface, Appwrite como backend pa
 
 ---
 
-## ⚙️ Stack Tecnológica
+## ⚙️ Tecnologias Utilizadas	
 
 - [React.js](https://reactjs.org/)
 - [Appwrite](https://appwrite.io/)
