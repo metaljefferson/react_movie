@@ -15,6 +15,7 @@ const API_OPTIONS = {
     Authorization: `Bearer ${API_KEY}`
   }
 }
+// comentario
 
 const App = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
